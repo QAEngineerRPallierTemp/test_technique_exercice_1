@@ -17,10 +17,12 @@ defmodule TestTechniqueExercice1 do
   end
 
   def launch do
-    alias TestTechniqueExercice1.{Job}
+    alias TestTechniqueExercice1.{Job, Profession}
 
     jobs = Job.all()
+    professions = Profession.all()
 
     IO.inspect Enum.at(jobs, 0)
+    IO.inspect Enum.at(professions, 0)
   end
 end
