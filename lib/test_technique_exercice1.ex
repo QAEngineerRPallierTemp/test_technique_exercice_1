@@ -15,4 +15,12 @@ defmodule TestTechniqueExercice1 do
   def hello do
     :world
   end
+
+  def launch do
+    alias TestTechniqueExercice1.{Job}
+
+    jobs = Job.all()
+
+    IO.inspect Enum.at(jobs, 0)
+  end
 end
