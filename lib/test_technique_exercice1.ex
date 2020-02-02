@@ -12,10 +12,7 @@ defmodule TestTechniqueExercice1 do
       :world
 
   """
-  def hello do
-    :world
-  end
-
+  
   def launch do
     alias TestTechniqueExercice1.{Job, Profession}
 

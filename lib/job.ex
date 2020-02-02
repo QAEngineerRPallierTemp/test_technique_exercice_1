@@ -27,21 +27,25 @@ defmodule TestTechniqueExercice1.Job do
   end
 
   def all do
-    header = nil
-    jobs = nil
-    jobsStream = nil
+    # header, la ligne contenant les attributs
+    # jobs, les lignes contenant les infos d'un job par ligne
+    # jobsStream, le Stream des lignes lues du CSV
 
     jobsStream = File.stream!(Path.join("data", "technical-test-jobs.csv"))
       |> Stream.map(&String.trim(&1))
       |> Stream.map(&String.split(&1, ","))
 
-    header = Enum.take(jobsStream, 1) |> Enum.at(0) |> Enum.map(fn x -> String.to_atom(x) end)
-    jobs = Enum.to_list(jobsStream) |> List.delete_at(0)
+    header = Enum.take(jobsStream, 1)
+      |> Enum.at(0)
+      |> Enum.map(fn x -> String.to_atom(x) end)
+
+    jobs = Enum.to_list(jobsStream)
+      |> List.delete_at(0)
 
     Enum.map(jobs, fn(jobRow) ->                                                                                                                                                                              
-      # Map the header to each jobRow field                                                                                                                                                                    
-      jobRow = Enum.zip(header, jobRow) |> Enum.into(%Job{})
-      # Do some processing with the jobRow
+      # Map the header to each jobRow field
+      Enum.zip(header, jobRow)
+        |> Enum.into(%Job{})
 
       end                                             
     )
