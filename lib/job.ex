@@ -58,6 +58,20 @@ defmodule TestTechniqueExercice1.Job do
   end
 
   def get_cn_by_ct(jobs, professions) do
+
+    # On prépare la map qui contiendra le total par category_name
+    # On lui ajoute la category_name par défaut "Aucune"
+    cnTotaux = Enum.reduce professions, %{}, fn a, acc ->
+      Map.put(acc, a.category_name, 0)
+    end
+    cnTotaux = Map.put(cnTotaux, "Aucune", 0)
+
+    # Préparation du retour en regroupant les différents totaux
+    totaux = Map.put(%{}, :cnTotaux, cnTotaux)
+    totaux = Map.put(totaux, :ctTotaux, %{})
+    totaux = Map.put(totaux, :totaux, 0)
+
+    # Récupération d'un mapping id => category_name
     idByCategoryName = Enum.reduce(
       professions,
       %{},
@@ -65,16 +79,21 @@ defmodule TestTechniqueExercice1.Job do
         Map.put(acc, a.id, a.category_name)
       end
     )
-    IO.inspect idByCategoryName
 
-    ctByCN = Enum.group_by(
+    # On group par contract_type
+    # En groupant on remplace l'id par category_name
+    # Si la category_name n'existe pas alors on lui affecte "Aucune"
+    cnByCt = Enum.group_by(
       jobs,
       fn x -> x.contract_type end,
       fn x -> (idByCategoryName[x.profession_id] || "Aucune") end
     )
 
-    Enum.map(
-      ctByCN,
+    # On parcours l'ensemble des contract_type
+    # Pour chaque contract_type les category_name sont comptés
+    # Puis mappé en category_name => nb_category_name
+    cnByCt = Enum.map(
+      cnByCt,
       fn {k, v} -> 
         %{
           k =>
@@ -84,5 +103,46 @@ defmodule TestTechniqueExercice1.Job do
         }
       end
     )
+
+    totaux = Enum.reduce(
+      cnByCt,
+      totaux,
+      fn a, acc ->
+        ctKey = hd(Map.keys(a))
+        ctValue = a[ctKey]       
+
+        acc = Map.put(
+          acc,
+          :cnTotaux,
+          Enum.reduce(
+            ctValue,
+            acc[:cnTotaux],
+            fn b, acc2 ->
+              {k, v} = b
+              Map.put(acc2, k, acc2[k] + v)
+            end
+          )
+        )
+        acc = Map.put(
+          acc,
+          :ctTotaux,
+          Enum.reduce(
+            ctValue,
+            acc[:ctTotaux],
+            fn b, acc2 ->
+              {k, v} = b
+              Map.put(acc2, ctKey, (acc2[ctKey] || 0) + v)
+            end
+          )
+        )
+        Map.put(acc, :totaux, acc[:totaux]+ acc[:ctTotaux][ctKey])
+      end
+    )
+
+    Map.put(totaux, :cnByCt, cnByCt)
+  end
+
+  def draw_cn_by_ct(jobs, professions) do
+    cnByCt = Job.get_cn_by_ct(jobs, professions)
   end
 end

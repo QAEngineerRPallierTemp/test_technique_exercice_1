@@ -27,17 +27,6 @@ defmodule TestTechniqueExercice1 do
     jobs = Job.all()
     professions = Profession.all()
 
-    IO.inspect Enum.at(jobs, 0)
-    IO.inspect Enum.at(professions, 0)
-
-    ctSizeMax = String.length(
-        Enum.max_by(
-        jobs, fn x -> String.length(x.contract_type) end
-      ).contract_type
-    )
-
-    IO.puts ctSizeMax
-
-    Job.get_cn_by_ct(jobs, professions)
+    Job.draw_cn_by_ct(jobs, professions)
   end
 end
