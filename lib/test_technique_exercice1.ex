@@ -4,17 +4,22 @@ defmodule TestTechniqueExercice1 do
   """
 
   @doc """
-  Hello world.
+  Affichage du nombre d'offres par catégorie de profession par type de contrat.
 
   ## Examples
 
-      iex> TestTechniqueExercice1.hello()
-      :world
-
+      iex> TestTechniqueExercice1.launch()
+      ------------------------------------- 
+      |            |   TOTAL   |   TECH   | 
+      | ---------- | --------- | -------- | 
+      | TOTAL      |     1     |     1    | 
+      | ---------- | --------- | -------- | 
+      | FULL_TIME  |     1     |     1    | 
+      | ---------- | --------- | -------- | 
+      | INTERNSHIP |     0     |     0    | 
+      ------------------------------------- 
+ 
   """
-  def hello do
-    :world
-  end
 
   def launch do
     alias TestTechniqueExercice1.{Job, Profession}
@@ -22,7 +27,6 @@ defmodule TestTechniqueExercice1 do
     jobs = Job.all()
     professions = Profession.all()
 
-    IO.inspect Enum.at(jobs, 0)
-    IO.inspect Enum.at(professions, 0)
+    Job.draw_cn_by_ct(jobs, professions)
   end
 end

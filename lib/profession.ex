@@ -27,21 +27,25 @@ defmodule TestTechniqueExercice1.Profession do
   end
 
   def all do
-    header = nil
-    professions = nil
-    professionsStream = nil
+    # header, la ligne contenant les attributs
+    # professions, les lignes contenant les infos d'une profession par ligne
+    # professionsStream, le Stream des lignes lues du CSV
 
     professionsStream = File.stream!(Path.join("data", "technical-test-professions.csv"))
       |> Stream.map(&String.trim(&1))
       |> Stream.map(&String.split(&1, ","))
 
-    header = Enum.take(professionsStream, 1) |> Enum.at(0) |> Enum.map(fn x -> String.to_atom(x) end)
-    professions = Enum.to_list(professionsStream) |> List.delete_at(0)
+    header = Enum.take(professionsStream, 1)
+      |> Enum.at(0)
+      |> Enum.map(fn x -> String.to_atom(x) end)
 
-    Enum.map(professions, fn(professionRow) ->                                                                                                                                                                              
-      # Map the header to each professionRow field                                                                                                                                                                    
-      professionRow = Enum.zip(header, professionRow) |> Enum.into(%Profession{})
-      # Do some processing with the professionRow
+    professions = Enum.to_list(professionsStream)
+      |> List.delete_at(0)
+
+    Enum.map(professions, fn(professionRow) ->                                                                                                                                                                     
+      # Map the header to each professionRow field
+      Enum.zip(header, professionRow)
+        |> Enum.into(%Profession{})
 
       end                                             
     )
