@@ -42,7 +42,7 @@ defmodule TestTechniqueExercice1.Profession do
     professions = Enum.to_list(professionsStream)
       |> List.delete_at(0)
 
-    Enum.map(professions, fn(professionRow) ->                                                                                                                                                                              
+    Enum.map(professions, fn(professionRow) ->                                                                                                                                                                     
       # Map the header to each professionRow field
       Enum.zip(header, professionRow)
         |> Enum.into(%Profession{})
