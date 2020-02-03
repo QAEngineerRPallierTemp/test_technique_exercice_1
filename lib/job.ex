@@ -144,5 +144,37 @@ defmodule TestTechniqueExercice1.Job do
 
   def draw_cn_by_ct(jobs, professions) do
     cnByCt = Job.get_cn_by_ct(jobs, professions)
+
+    # IO.inspect cnByCt[:cnTotaux]
+
+    {cn, _} = Enum.max_by(cnByCt[:cnTotaux], fn {k,_v} -> String.length(k) end)
+    {ct, _} = Enum.max_by(cnByCt[:ctTotaux], fn {k,_v} -> String.length(k) end)
+    cnMax = String.length(cn)
+    ctMax = String.length(ct)
+    max = length(Map.keys(cnByCt[:cnTotaux]))
+    outHSeparator = String.duplicate("-", 1 + ( ctMax + 2 ) + ( max * ( 2 + cnMax ) + 1))
+    inHcnSeparator = String.duplicate("-", cnMax)
+    inHctSeparator = String.duplicate("-", ctMax)
+    # IO.inspect max
+    # IO.inspect cnMax
+    # IO.inspect ctMax
+
+    
+    IO.puts outHSeparator
+    IO.puts "|"
+    Enum.each(
+      cnByCt[:ctTotaux],
+      fn x ->
+        {k, v} = x
+        row = "| " <> k  
+        IO.puts "| " <> inHctSeparator      
+        IO.puts row
+      end
+    )
+    IO.puts outHSeparator
+  end
+
+  def prepare_draw_case(string, separator, max) do
+
   end
 end
