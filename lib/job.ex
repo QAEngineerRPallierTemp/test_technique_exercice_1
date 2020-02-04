@@ -156,6 +156,7 @@ defmodule TestTechniqueExercice1.Job do
     cnMax = String.length(cn)
     ctMax = String.length(ct)
     cnKeys = Map.keys(cnByCt[:cnTotaux])
+    cnKeys = ["TOTAL"] ++ cnKeys
     max = length(cnKeys)
 
     outHSeparator = String.duplicate("-", (1 + 1 + ctMax + 1 ) + ( max * ( 1 + 1 + cnMax + 1) ) + 1)
@@ -172,9 +173,16 @@ defmodule TestTechniqueExercice1.Job do
 
     case00 = String.duplicate(" ", ctMax)
     line0Values = [case00] ++ cnKeys
+    cnKeys = tl(cnKeys)
+
+    line1Values = Map.values(cnByCt[:cnTotaux])
+    line1Values = [cnByCt[:totaux]] ++ line1Values
+    line1Values = ["TOTAL"] ++ line1Values
     
     IO.puts outHSeparator
     IO.puts prepare_draw_line(line0Values, " ", cnMax, ctMax)
+    IO.puts prepare_draw_line(inHSeparators, " ", cnMax, ctMax)
+    IO.puts prepare_draw_line(line1Values, " ", cnMax, ctMax)
     Enum.each(
       cnByCt[:cnByCt],
       fn {ctKey, values} ->
@@ -183,11 +191,14 @@ defmodule TestTechniqueExercice1.Job do
           [],
           fn key, acc ->
             v = (values[key] || 0)
-            acc ++ [to_string(v)]
+            acc ++ [v]
           end
         )
 
-        lineYValues = [ctKey] ++ cnValues
+        ctTotal = to_string(cnByCt[:ctTotaux][ctKey])
+
+        lineYValues = [ctTotal] ++ cnValues
+        lineYValues = [ctKey] ++ lineYValues
 
         IO.puts prepare_draw_line(inHSeparators, " ", cnMax, ctMax)
         IO.puts prepare_draw_line(lineYValues, " ", cnMax, ctMax)
@@ -196,7 +207,8 @@ defmodule TestTechniqueExercice1.Job do
     IO.puts outHSeparator
   end
 
-  def prepare_draw_case(string, separator, max) do
+  def prepare_draw_case(element, separator, max) do
+    string = to_string(element)
     stringL = String.length(string)
     diff = max - stringL
     separatorRem = rem(diff, 2)
