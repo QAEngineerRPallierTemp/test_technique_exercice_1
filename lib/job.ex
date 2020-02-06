@@ -92,15 +92,20 @@ defmodule TestTechniqueExercice1.Job do
     # On parcours l'ensemble des contract_type
     # Pour chaque contract_type les category_name sont comptés
     # Puis mappé en category_name => nb_category_name
-    cnByCt = Enum.map(
+    cnByCt = Enum.reduce(
       cnByCt,
-      fn {k, v} -> 
-        %{
-          k =>
-          (Enum.reduce v, %{}, fn a, acc ->
-            Map.put(acc, a, (acc[a] || 0) + 1)
-          end)
-        }
+      %{},
+      fn a, acc ->
+        {k, v} = a
+        Map.put(
+          acc,
+          k,
+          (
+            Enum.reduce v, %{}, fn b, acc2 ->
+              Map.put(acc2, b, (acc2[b] || 0) + 1)
+            end
+          )
+        )
       end
     )
 
@@ -108,8 +113,7 @@ defmodule TestTechniqueExercice1.Job do
       cnByCt,
       totaux,
       fn a, acc ->
-        ctKey = hd(Map.keys(a))
-        ctValue = a[ctKey]       
+        {ctKey, ctValue} = a      
 
         acc = Map.put(
           acc,
@@ -130,7 +134,7 @@ defmodule TestTechniqueExercice1.Job do
             ctValue,
             acc[:ctTotaux],
             fn b, acc2 ->
-              {k, v} = b
+              {_k, v} = b
               Map.put(acc2, ctKey, (acc2[ctKey] || 0) + v)
             end
           )
@@ -144,5 +148,85 @@ defmodule TestTechniqueExercice1.Job do
 
   def draw_cn_by_ct(jobs, professions) do
     cnByCt = Job.get_cn_by_ct(jobs, professions)
+
+    # IO.inspect cnByCt[:cnTotaux]
+
+    {cn, _} = Enum.max_by(cnByCt[:cnTotaux], fn {k,_v} -> String.length(k) end)
+    {ct, _} = Enum.max_by(cnByCt[:ctTotaux], fn {k,_v} -> String.length(k) end)
+    cnMax = String.length(cn)
+    ctMax = String.length(ct)
+    cnKeys = Map.keys(cnByCt[:cnTotaux])
+    cnKeys = ["TOTAL"] ++ cnKeys
+    max = length(cnKeys)
+
+    outHSeparator = String.duplicate("-", (1 + 1 + ctMax + 1 ) + ( max * ( 1 + 1 + cnMax + 1) ) + 1)
+    inHcnSeparator = String.duplicate("-", cnMax)
+    inHctSeparator = String.duplicate("-", ctMax)
+    inHcnSeparators = Enum.reduce(
+      cnKeys,
+      [],
+      fn _a, acc ->
+        [inHcnSeparator] ++ acc
+      end
+    )
+    inHSeparators = [inHctSeparator] ++ inHcnSeparators
+
+    case00 = String.duplicate(" ", ctMax)
+    line0Values = [case00] ++ cnKeys
+    cnKeys = tl(cnKeys)
+
+    line1Values = Map.values(cnByCt[:cnTotaux])
+    line1Values = [cnByCt[:totaux]] ++ line1Values
+    line1Values = ["TOTAL"] ++ line1Values
+    
+    IO.puts outHSeparator
+    IO.puts prepare_draw_line(line0Values, " ", cnMax, ctMax)
+    IO.puts prepare_draw_line(inHSeparators, " ", cnMax, ctMax)
+    IO.puts prepare_draw_line(line1Values, " ", cnMax, ctMax)
+    Enum.each(
+      cnByCt[:cnByCt],
+      fn {ctKey, values} ->
+        cnValues = Enum.reduce(
+          cnKeys,
+          [],
+          fn key, acc ->
+            v = (values[key] || 0)
+            acc ++ [v]
+          end
+        )
+
+        ctTotal = to_string(cnByCt[:ctTotaux][ctKey])
+
+        lineYValues = [ctTotal] ++ cnValues
+        lineYValues = [ctKey] ++ lineYValues
+
+        IO.puts prepare_draw_line(inHSeparators, " ", cnMax, ctMax)
+        IO.puts prepare_draw_line(lineYValues, " ", cnMax, ctMax)
+      end
+    )
+    IO.puts outHSeparator
+  end
+
+  def prepare_draw_case(element, separator, max) do
+    string = to_string(element)
+    stringL = String.length(string)
+    diff = max - stringL
+    separatorRem = rem(diff, 2)
+    separatorDiv = div(diff, 2)
+    separatorDup = String.duplicate(separator, separatorDiv + 1)
+    "|" <> separatorDup <> string <> separatorDup <> String.duplicate(separator, separatorRem)
+  end
+
+  def prepare_draw_line(ctCnvalues, separator, cnMax, ctMax) do
+    [ct | cns] = ctCnvalues
+    line = Job.prepare_draw_case(ct, separator, ctMax)
+    line = Enum.reduce(
+      cns,
+      line,
+      fn value, acc ->
+        acc <> Job.prepare_draw_case(value, separator, cnMax)
+      end
+    )
+    line <> "|"
   end
 end
